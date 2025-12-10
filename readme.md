@@ -1,5 +1,5 @@
 # Rust Bullet Hell
 
 ## Todos:
-[ ] screen manager
-[ ] event handler
+- [ ] screen manager
+- [ ] event handler
