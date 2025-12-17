@@ -19,7 +19,7 @@ impl Player {
         }
     }
 
-    pub async fn draw(&mut self) {
+    pub fn draw(&self) {
         draw_circle(self.position.x, self.position.y, self.size, self.color);
     }
 
@@ -31,14 +31,9 @@ impl Player {
         
         let velocity = norm * self.speed * dt;
         
-        println!("Velocity: {:?}", velocity);
-        
         self.position += velocity;
     }
-    
-    pub fn add_force(&mut self, force: Vec2) {
-        self.direction += force;
-    }
+
     pub fn set_direction(&mut self, direction: Vec2) {
         self.direction = direction;
     }

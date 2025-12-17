@@ -7,6 +7,12 @@ use crate::{
 };
 use macroquad::ui::Skin;
 
+pub enum ScreenCommand {
+    None,
+    Replace(Screen),
+    Quit,
+}
+
 pub enum Screen {
     MainMenu(MainMenuScreen),
     Game(GameScreen),
@@ -25,17 +31,17 @@ impl Screen {
         Screen::Game(GameScreen::new(skin))
     }
 
-    pub async fn draw_with_ui(&mut self, ui: &mut macroquad::ui::Ui) -> Option<Screen> {
+    pub fn draw_with_ui(&mut self, ui: &mut macroquad::ui::Ui) -> ScreenCommand {
         match self {
-            Screen::MainMenu(screen) => screen.draw(ui).await,
-            Screen::Game(screen) => screen.draw(ui).await,
+            Screen::MainMenu(screen) => screen.draw(ui),
+            Screen::Game(screen) => screen.draw(ui),
         }
     }
 
-    pub async fn handle_event(&mut self, dt: f32)  {
+    pub fn update(&mut self, dt: f32) -> ScreenCommand {
         match self {
-            Screen::MainMenu(screen) => screen.handle_event().await,
-            Screen::Game(screen) => screen.handle_event(dt).await,
+            Screen::MainMenu(screen) => screen.update(dt),
+            Screen::Game(screen) => screen.update(dt),
         }
     }
 }

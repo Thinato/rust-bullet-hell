@@ -4,10 +4,9 @@ use macroquad::{
     ui::{Skin, Ui, root_ui},
 };
 
-use crate::screens::Screen;
+use crate::screens::{Screen, ScreenCommand};
 
 pub struct Director {
-    default_skin: Skin,
     current_screen: Screen,
 }
 
@@ -17,37 +16,28 @@ impl Director {
 
         Director {
             current_screen: Screen::main_menu(skin.clone()),
-            default_skin: skin,
         }
     }
 
-    pub async fn draw(&mut self) {
+    pub fn update(&mut self, dt: f32) -> ScreenCommand {
+        self.current_screen.update(dt)
+    }
+
+    pub fn draw(&mut self) -> ScreenCommand {
         let mut ui_handle = root_ui();
         let ui: &mut Ui = &mut *ui_handle;
 
-        ui.push_skin(&self.default_skin);
-        let next_screen = self.current_screen.draw_with_ui(ui).await;
-        ui.pop_skin();
-
-        if let Some(next_screen) = next_screen {
-            self.change_screen(next_screen);
-        }
-    }
-    
-    pub async fn handle_event(&mut self, dt: f32) {
-        self.current_screen.handle_event(dt).await;
+        self.current_screen.draw_with_ui(ui)
     }
 
     pub fn change_screen(&mut self, screen: Screen) {
         self.current_screen = screen;
     }
 
-    pub fn skin(&self) -> Skin {
-        self.default_skin.clone()
-    }
-
     async fn build_default_skin() -> Skin {
-        let font = load_ttf_font("assets/fonts/8bit.ttf").await.unwrap();
+        let font = load_ttf_font("assets/fonts/8bit.ttf")
+            .await
+            .expect("failed to load assets/fonts/8bit.ttf");
 
         let button_style = root_ui()
             .style_builder()

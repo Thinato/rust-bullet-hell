@@ -1,4 +1,5 @@
 use crate::screens::director::Director;
+use crate::screens::ScreenCommand;
 use macroquad::prelude::*;
 
 pub struct Game {
@@ -15,22 +16,34 @@ impl Game {
     pub async fn start(&mut self) {
         loop {
             let dt = get_frame_time();
-            
-            self.handle_event(dt).await.unwrap();
+
+            if is_key_pressed(KeyCode::Escape) {
+                break;
+            }
+
+            let update_command = self.director.update(dt);
+            if self.apply_command(update_command) {
+                break;
+            }
 
             clear_background(BLACK);
-            self.director.draw().await;
+
+            let draw_command = self.director.draw();
+            if self.apply_command(draw_command) {
+                break;
+            }
             next_frame().await
         }
     }
 
-    pub async fn handle_event(&mut self, dt: f32) -> Result<(), String> {
-        // handle global events
-        if is_key_pressed(KeyCode::Escape) {
-            std::process::exit(0)
+    fn apply_command(&mut self, command: ScreenCommand) -> bool {
+        match command {
+            ScreenCommand::None => false,
+            ScreenCommand::Replace(screen) => {
+                self.director.change_screen(screen);
+                false
+            }
+            ScreenCommand::Quit => true,
         }
-
-        self.director.handle_event(dt).await;
-        Ok(())
     }
 }

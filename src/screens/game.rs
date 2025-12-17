@@ -1,6 +1,9 @@
-use crate::{entities::player::Player, screens::Screen};
+use crate::{
+    entities::player::Player,
+    screens::{Screen, ScreenCommand},
+};
 use macroquad::prelude::*;
-use macroquad::ui::Skin;
+use macroquad::ui::{Skin, Ui, widgets};
 
 pub struct GameScreen {
     skin: Skin,
@@ -15,31 +18,52 @@ impl GameScreen {
         }
     }
 
-    pub async fn handle_event(&mut self, dt: f32) {
-        self.player.set_direction(Vec2::ZERO);
-        
+    pub fn update(&mut self, dt: f32) -> ScreenCommand {
+        let mut direction = Vec2::ZERO;
+
         if is_key_down(KeyCode::W) || is_key_down(KeyCode::Up) {
-            self.player.add_force(Vec2::new(0.0, -1.0));
+            direction.y -= 1.0;
         }
         if is_key_down(KeyCode::S) || is_key_down(KeyCode::Down) {
-            self.player.add_force(Vec2::new(0.0, 1.0), );
+            direction.y += 1.0;
         }
         if is_key_down(KeyCode::A) || is_key_down(KeyCode::Left) {
-            self.player.add_force(Vec2::new(-1.0, 0.0), );
+            direction.x -= 1.0;
         }
         if is_key_down(KeyCode::D) || is_key_down(KeyCode::Right) {
-            self.player.add_force(Vec2::new(1.0, 0.0), );
+            direction.x += 1.0;
         }
+
+        self.player.set_direction(direction);
         self.player.go(dt);
+
+        ScreenCommand::None
     }
 
-    pub async fn draw(&mut self, _ui: &mut macroquad::ui::Ui) -> Option<Screen> {
-        // TODO: Implement game rendering and transitions.
-        // draw PowerUps
-        // draw Bullets
-        // draw Player
-        self.player.draw().await;
-        // draw UI
-        None
+    pub fn draw(&mut self, ui: &mut Ui) -> ScreenCommand {
+        self.player.draw();
+
+        ui.push_skin(&self.skin);
+
+        if widgets::Button::new("Back")
+            .position(vec2(10., 10.))
+            .size(vec2(100., 30.))
+            .ui(ui)
+        {
+            ui.pop_skin();
+            return ScreenCommand::Replace(Screen::main_menu(self.skin.clone()));
+        }
+
+        if widgets::Button::new("Quit")
+            .position(vec2(10., 50.))
+            .size(vec2(100., 30.))
+            .ui(ui)
+        {
+            ui.pop_skin();
+            return ScreenCommand::Quit;
+        }
+
+        ui.pop_skin();
+        ScreenCommand::None
     }
 }

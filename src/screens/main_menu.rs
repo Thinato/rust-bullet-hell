@@ -3,7 +3,7 @@ use macroquad::{
     ui::{Skin, Ui, widgets},
 };
 
-use crate::screens::Screen;
+use crate::screens::{Screen, ScreenCommand};
 
 pub struct MainMenuScreen {
     skin: Skin,
@@ -14,10 +14,11 @@ impl MainMenuScreen {
         MainMenuScreen { skin }
     }
 
-    pub async fn handle_event(&mut self) {}
+    pub fn update(&mut self, _dt: f32) -> ScreenCommand {
+        ScreenCommand::None
+    }
 
-    pub async fn draw(&mut self, ui: &mut Ui) -> Option<Screen> {
-        let mut next_screen = None;
+    pub fn draw(&mut self, ui: &mut Ui) -> ScreenCommand {
         ui.push_skin(&self.skin);
 
         if widgets::Button::new("Play")
@@ -25,7 +26,8 @@ impl MainMenuScreen {
             .size(vec2(100., 30.))
             .ui(ui)
         {
-            next_screen = Some(Screen::game(self.skin.clone()));
+            ui.pop_skin();
+            return ScreenCommand::Replace(Screen::game(self.skin.clone()));
         }
 
         if widgets::Button::new("Options")
@@ -41,11 +43,12 @@ impl MainMenuScreen {
             .size(vec2(100., 30.))
             .ui(ui)
         {
-            std::process::exit(0);
+            ui.pop_skin();
+            return ScreenCommand::Quit;
         }
 
         ui.pop_skin();
 
-        next_screen
+        ScreenCommand::None
     }
 }
