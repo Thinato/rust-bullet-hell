@@ -8,6 +8,7 @@ use macroquad::ui::{Skin, Ui, widgets};
 pub struct GameScreen {
     skin: Skin,
     player: Player,
+    show_menu: bool,
 }
 
 impl GameScreen {
@@ -15,11 +16,21 @@ impl GameScreen {
         GameScreen {
             skin,
             player: Player::new(),
+            show_menu: false,
         }
     }
 
     pub fn update(&mut self, dt: f32) -> ScreenCommand {
+        if is_key_pressed(KeyCode::Escape) {
+            self.show_menu = !self.show_menu;
+        }
+        
+        if self.show_menu {
+            return ScreenCommand::None;
+        }
+
         let mut direction = Vec2::ZERO;
+
 
         if is_key_down(KeyCode::W) || is_key_down(KeyCode::Up) {
             direction.y -= 1.0;
@@ -43,27 +54,29 @@ impl GameScreen {
     pub fn draw(&mut self, ui: &mut Ui) -> ScreenCommand {
         self.player.draw();
 
-        ui.push_skin(&self.skin);
 
-        if widgets::Button::new("Back")
-            .position(vec2(10., 10.))
-            .size(vec2(100., 30.))
-            .ui(ui)
-        {
+        if self.show_menu {
+            ui.push_skin(&self.skin);
+            if widgets::Button::new("Back")
+                .position(vec2(10., 10.))
+                .size(vec2(100., 30.))
+                .ui(ui)
+            {
+                ui.pop_skin();
+                return ScreenCommand::Replace(Screen::main_menu(self.skin.clone()));
+            }
+
+            if widgets::Button::new("Quit")
+                .position(vec2(10., 50.))
+                .size(vec2(100., 30.))
+                .ui(ui)
+            {
+                ui.pop_skin();
+                return ScreenCommand::Quit;
+            }
             ui.pop_skin();
-            return ScreenCommand::Replace(Screen::main_menu(self.skin.clone()));
         }
 
-        if widgets::Button::new("Quit")
-            .position(vec2(10., 50.))
-            .size(vec2(100., 30.))
-            .ui(ui)
-        {
-            ui.pop_skin();
-            return ScreenCommand::Quit;
-        }
-
-        ui.pop_skin();
         ScreenCommand::None
     }
 }

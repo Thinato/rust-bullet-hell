@@ -17,10 +17,6 @@ impl Game {
         loop {
             let dt = get_frame_time();
 
-            if is_key_pressed(KeyCode::Escape) {
-                break;
-            }
-
             let update_command = self.director.update(dt);
             if self.apply_command(update_command) {
                 break;
