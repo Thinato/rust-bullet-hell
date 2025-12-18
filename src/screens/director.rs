@@ -43,16 +43,33 @@ impl Director {
             .style_builder()
             .with_font(&font)
             .unwrap()
-            .color(Color::from_rgba(0, 0, 0, 255))
-            .color_hovered(Color::from_rgba(0, 0, 0, 255))
-            .color_clicked(Color::from_rgba(0, 0, 0, 255))
+            .font_size(24)
+            .color(Color::from_rgba(0, 0, 0, 0))
+            .color_hovered(Color::from_rgba(0, 0, 0, 0))
+            .color_clicked(Color::from_rgba(0, 0, 0, 0))
             .text_color(Color::from_rgba(255, 255, 255, 255))
             .text_color_hovered(Color::from_rgba(224, 140, 30, 255))
             .text_color_clicked(Color::from_rgba(235, 154, 49, 255))
             .build();
 
+        let window_style = root_ui()
+            .style_builder()
+            .color(Color::from_rgba(45, 45, 45, 255))
+            .build();
+
+        let label_style = root_ui()
+            .style_builder()
+            .with_font(&font)
+            .unwrap()
+            .font_size(24)
+            .color(Color::from_rgba(255, 255, 255, 255))
+            .text_color(Color::from_rgba(255, 255, 255, 255))
+            .build();
+
         Skin {
             button_style,
+            window_style,
+            label_style,
             ..root_ui().default_skin()
         }
     }
