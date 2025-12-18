@@ -53,40 +53,46 @@ impl GameScreen {
     }
 
     pub fn draw(&mut self, ui: &mut Ui) -> ScreenCommand {
+        let mut command = ScreenCommand::None;
         self.player.draw();
+        ui.push_skin(&self.skin);
 
         if self.show_menu {
-            ui.push_skin(&self.skin);
-
             let screen = vec2(screen_width(), screen_height());
-            let button_size = vec2(120., 30.);
-            let spacing = 12.;
+            let button_size = vec2(150., 42.);
+            let spacing = 18.;
+            let padding = 52.;
             let column_height = 2. * button_size.y + spacing;
-            let start = vec2(
-                (screen.x - button_size.x) * 0.5,
-                (screen.y - column_height) * 0.5,
+            let window_size = vec2(button_size.x + padding * 2., column_height + padding * 2.);
+            let window_pos = (screen - window_size) * 0.5;
+            let inner_start = vec2(
+                (window_size.x - button_size.x) * 0.5,
+                (window_size.y - column_height) * 0.5,
             );
 
-            if widgets::Button::new("Back")
-                .position(start)
-                .size(button_size)
-                .ui(ui)
-            {
-                ui.pop_skin();
-                return ScreenCommand::Replace(Screen::main_menu(self.skin.clone()));
-            }
+            widgets::Window::new(1, window_pos, window_size)
+                .movable(false)
+                .titlebar(false)
+                .ui(ui, |ui| {
+                    if widgets::Button::new("Back")
+                        .position(inner_start)
+                        .size(button_size)
+                        .ui(ui)
+                    {
+                        command = ScreenCommand::Replace(Screen::main_menu(self.skin.clone()));
+                    }
 
-            if widgets::Button::new("Quit")
-                .position(vec2(start.x, start.y + button_size.y + spacing))
-                .size(button_size)
-                .ui(ui)
-            {
-                ui.pop_skin();
-                return ScreenCommand::Quit;
-            }
-            ui.pop_skin();
+                    if widgets::Button::new("Quit")
+                        .position(vec2(inner_start.x, inner_start.y + button_size.y + spacing))
+                        .size(button_size)
+                        .ui(ui)
+                    {
+                        command = ScreenCommand::Quit;
+                    }
+                });
         }
+        ui.pop_skin();
 
-        ScreenCommand::None
+        command
     }
 }

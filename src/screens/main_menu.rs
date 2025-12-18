@@ -1,6 +1,7 @@
 use macroquad::{
     math::vec2,
     prelude::{screen_height, screen_width},
+    time::draw_fps,
     ui::{Skin, Ui, widgets},
 };
 
@@ -31,7 +32,7 @@ impl MainMenuScreen {
             (screen.y - column_height) * 0.5,
         );
 
-        if widgets::Button::new("Play")
+        if widgets::Button::new("START GAME")
             .position(start)
             .size(button_size)
             .ui(ui)
@@ -40,7 +41,7 @@ impl MainMenuScreen {
             return ScreenCommand::Replace(Screen::game(self.skin.clone()));
         }
 
-        if widgets::Button::new("Options")
+        if widgets::Button::new("OPTIONS")
             .position(vec2(start.x, start.y + button_size.y + spacing))
             .size(button_size)
             .ui(ui)
@@ -48,7 +49,7 @@ impl MainMenuScreen {
             println!("Options clicked (not implemented yet)");
         }
 
-        if widgets::Button::new("Quit")
+        if widgets::Button::new("EXIT")
             .position(vec2(start.x, start.y + 2. * button_size.y + 2. * spacing))
             .size(button_size)
             .ui(ui)
