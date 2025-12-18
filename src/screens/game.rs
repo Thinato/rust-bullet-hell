@@ -10,6 +10,8 @@ pub struct GameScreen {
     player: Player,
     bullets: Vec<Bullet>,
     bullet_spawn_timer: f32,
+    bullet_spawn_deduction: f32,
+    bullet_spawn_deduction_timer: f32,
     show_menu: bool,
 }
 
@@ -26,6 +28,8 @@ impl GameScreen {
             bullets,
             bullet_spawn_timer,
             show_menu: false,
+            bullet_spawn_deduction: 0.2,
+            bullet_spawn_deduction_timer: 5.0,
         }
     }
 
@@ -38,18 +42,8 @@ impl GameScreen {
             return ScreenCommand::None;
         }
 
-        self.bullet_spawn_timer -= dt;
-        if self.bullet_spawn_timer <= 0.0 {
-            self.bullets.push(Bullet::new_slow());
-            self.bullet_spawn_timer = 0.2;
-        }
-
-        self.bullets.retain(|bullet| !bullet.dead);
-
-        self.bullets.iter_mut().for_each(|bullet| bullet.update(dt));
-
         let mut direction = Vec2::ZERO;
-
+        
         if is_key_down(KeyCode::W) || is_key_down(KeyCode::Up) {
             direction.y -= 1.0;
         }
@@ -64,7 +58,29 @@ impl GameScreen {
         }
 
         self.player.set_direction(direction);
-        self.player.go(dt);
+        self.player.update(dt);
+
+        self.bullet_spawn_timer -= dt;
+        self.bullet_spawn_deduction_timer -= dt;
+        if self.bullet_spawn_timer <= 0.0 {
+            self.bullets.push(Bullet::new_slow());
+            self.bullet_spawn_timer = self.bullet_spawn_deduction;
+        }
+        
+        if self.bullet_spawn_deduction_timer <= 0.0 {
+            self.bullet_spawn_deduction -= 0.01;
+            self.bullet_spawn_deduction_timer = 5.0;
+            println!("Bullet spawn deduction increased to {}", self.bullet_spawn_deduction);
+        }
+
+        self.bullets.retain(|bullet| !bullet.dead);
+
+        for bullet in &mut self.bullets {
+            bullet.update(dt);
+            if self.player.rect().intersect(bullet.rect()).is_some() {
+                self.player.take_damage(1);
+            }
+        }
 
         ScreenCommand::None
     }

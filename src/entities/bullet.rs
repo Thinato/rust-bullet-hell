@@ -1,7 +1,7 @@
 use macroquad::prelude::*;
 
 pub struct Bullet {
-    position: Vec2,
+    pub position: Vec2,
     speed: f32,
     size: Vec2,
     color: Color,
@@ -25,7 +25,7 @@ impl Bullet {
 
         Bullet {
             position,
-            speed: 100.,
+            speed: 175.,
             size: (direction.abs() + 1.) * 7.,
             color: RED,
             direction,
@@ -54,5 +54,9 @@ impl Bullet {
             self.size.y,
             self.color,
         );
+    }
+    
+    pub fn rect(&self) -> Rect {
+        Rect::new(self.position.x, self.position.y, self.size.x, self.size.y)
     }
 }

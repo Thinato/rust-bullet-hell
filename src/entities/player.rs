@@ -2,10 +2,14 @@ use macroquad::prelude::*;
 
 pub struct Player {
     position: Vec2,
-    speed: f32,
     size: f32,
+    speed: f32,
     color: Color,
+    immune_color: Color,
     direction: Vec2,
+    health: i32,
+    immunity: bool,
+    immunity_timer: f32,
 }
 
 impl Player {
@@ -13,17 +17,33 @@ impl Player {
         Player {
             position,
             speed: 100.,
-            size: 10.0,
+            size: 20.0,
             color: GREEN,
+            immune_color: DARKGREEN,
             direction: Vec2::ZERO,
+            health: 100,
+            immunity: false,
+            immunity_timer: 0.0,
         }
     }
 
     pub fn draw(&self) {
-        draw_circle(self.position.x, self.position.y, self.size, self.color);
+        draw_rectangle(
+            self.position.x,
+            self.position.y,
+            self.size,
+            self.size,
+            if self.immunity { self.immune_color } else { self.color },
+        );
     }
-
-    pub fn go(&mut self, dt: f32) {
+    
+    pub fn update(&mut self, dt: f32) {
+        if self.immunity {
+            self.immunity_timer -= dt;
+            if self.immunity_timer <= 0.0 {
+                self.immunity = false;
+            }
+        }
         if self.direction.length() == 0.0 {
             return;
         }
@@ -34,7 +54,25 @@ impl Player {
         self.position += velocity;
     }
 
+
     pub fn set_direction(&mut self, direction: Vec2) {
         self.direction = direction;
+    }
+
+    pub fn take_damage(&mut self, damage: i32) {
+        if self.immunity {
+            return;
+        }
+        println!("Player took damage!");
+        self.immunity = true;
+        self.immunity_timer = 0.5;
+        self.health -= damage;
+        if self.health <= 0 {
+            self.health = 0;
+        }
+    }
+
+    pub fn rect(&self) -> Rect {
+        Rect::new(self.position.x, self.position.y, self.size, self.size)
     }
 }
