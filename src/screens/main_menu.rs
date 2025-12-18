@@ -1,7 +1,6 @@
 use macroquad::{
     math::vec2,
     prelude::{screen_height, screen_width},
-    time::draw_fps,
     ui::{Skin, Ui, widgets},
 };
 
