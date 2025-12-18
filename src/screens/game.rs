@@ -43,7 +43,7 @@ impl GameScreen {
         }
 
         let mut direction = Vec2::ZERO;
-        
+
         if is_key_down(KeyCode::W) || is_key_down(KeyCode::Up) {
             direction.y -= 1.0;
         }
@@ -66,11 +66,14 @@ impl GameScreen {
             self.bullets.push(Bullet::new_slow());
             self.bullet_spawn_timer = self.bullet_spawn_deduction;
         }
-        
+
         if self.bullet_spawn_deduction_timer <= 0.0 {
             self.bullet_spawn_deduction -= 0.01;
             self.bullet_spawn_deduction_timer = 5.0;
-            println!("Bullet spawn deduction increased to {}", self.bullet_spawn_deduction);
+            println!(
+                "Bullet spawn deduction increased to {}",
+                self.bullet_spawn_deduction
+            );
         }
 
         self.bullets.retain(|bullet| !bullet.dead);
@@ -78,7 +81,7 @@ impl GameScreen {
         for bullet in &mut self.bullets {
             bullet.update(dt);
             if self.player.rect().intersect(bullet.rect()).is_some() {
-                self.player.take_damage(1);
+                self.player.take_damage(35);
             }
         }
 
@@ -87,12 +90,19 @@ impl GameScreen {
 
     pub fn draw(&mut self, ui: &mut Ui) -> ScreenCommand {
         let mut command = ScreenCommand::None;
+        let screen = vec2(screen_width(), screen_height());
         self.player.draw();
         self.bullets.iter_mut().for_each(|bullet| bullet.draw());
         ui.push_skin(&self.skin);
+        widgets::Window::new(2, vec2(0., 0.), vec2(screen.x, 100.))
+            .movable(false)
+            .titlebar(false)
+            .ui(ui, |ui| {
+                widgets::Label::new("Health: ").ui(ui);
+                widgets::Label::new(format!("{}", self.player.health)).ui(ui);
+            });
 
         if self.show_menu {
-            let screen = vec2(screen_width(), screen_height());
             let button_size = vec2(150., 42.);
             let spacing = 18.;
             let padding = 52.;

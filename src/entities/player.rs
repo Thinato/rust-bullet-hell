@@ -7,7 +7,7 @@ pub struct Player {
     color: Color,
     immune_color: Color,
     direction: Vec2,
-    health: i32,
+    pub health: i32,
     immunity: bool,
     immunity_timer: f32,
 }
