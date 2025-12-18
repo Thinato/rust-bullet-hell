@@ -1,5 +1,5 @@
 use crate::{
-    entities::player::Player,
+    entities::{bullet::Bullet, player::Player},
     screens::{Screen, ScreenCommand},
 };
 use macroquad::prelude::*;
@@ -8,16 +8,23 @@ use macroquad::ui::{Skin, Ui, widgets};
 pub struct GameScreen {
     skin: Skin,
     player: Player,
+    bullets: Vec<Bullet>,
+    bullet_spawn_timer: f32,
     show_menu: bool,
 }
 
 impl GameScreen {
     pub fn new(skin: Skin) -> Self {
         let center = vec2(screen_width() * 0.5, screen_height() * 0.5);
+        let player = Player::new_at(center);
+        let bullets = Vec::new();
+        let bullet_spawn_timer = 0.1;
 
         GameScreen {
             skin,
-            player: Player::new_at(center),
+            player,
+            bullets,
+            bullet_spawn_timer,
             show_menu: false,
         }
     }
@@ -30,6 +37,16 @@ impl GameScreen {
         if self.show_menu {
             return ScreenCommand::None;
         }
+
+        self.bullet_spawn_timer -= dt;
+        if self.bullet_spawn_timer <= 0.0 {
+            self.bullets.push(Bullet::new_slow());
+            self.bullet_spawn_timer = 0.2;
+        }
+
+        self.bullets.retain(|bullet| !bullet.dead);
+
+        self.bullets.iter_mut().for_each(|bullet| bullet.update(dt));
 
         let mut direction = Vec2::ZERO;
 
@@ -55,6 +72,7 @@ impl GameScreen {
     pub fn draw(&mut self, ui: &mut Ui) -> ScreenCommand {
         let mut command = ScreenCommand::None;
         self.player.draw();
+        self.bullets.iter_mut().for_each(|bullet| bullet.draw());
         ui.push_skin(&self.skin);
 
         if self.show_menu {
