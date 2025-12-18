@@ -9,9 +9,9 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn new() -> Self {
+    pub fn new_at(position: Vec2) -> Self {
         Player {
-            position: vec2(100., 100.),
+            position,
             speed: 100.,
             size: 10.0,
             color: GREEN,
@@ -28,9 +28,9 @@ impl Player {
             return;
         }
         let norm = self.direction.normalize();
-        
+
         let velocity = norm * self.speed * dt;
-        
+
         self.position += velocity;
     }
 

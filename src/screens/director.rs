@@ -1,5 +1,5 @@
 use macroquad::{
-    color::{Color},
+    color::Color,
     text::load_ttf_font,
     ui::{Skin, Ui, root_ui},
 };

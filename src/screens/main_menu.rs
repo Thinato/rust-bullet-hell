@@ -1,5 +1,6 @@
 use macroquad::{
     math::vec2,
+    prelude::{screen_height, screen_width},
     ui::{Skin, Ui, widgets},
 };
 
@@ -21,9 +22,18 @@ impl MainMenuScreen {
     pub fn draw(&mut self, ui: &mut Ui) -> ScreenCommand {
         ui.push_skin(&self.skin);
 
+        let screen = vec2(screen_width(), screen_height());
+        let button_size = vec2(120., 30.);
+        let spacing = 12.;
+        let column_height = 3. * button_size.y + 2. * spacing;
+        let start = vec2(
+            (screen.x - button_size.x) * 0.5,
+            (screen.y - column_height) * 0.5,
+        );
+
         if widgets::Button::new("Play")
-            .position(vec2(0., 10.))
-            .size(vec2(100., 30.))
+            .position(start)
+            .size(button_size)
             .ui(ui)
         {
             ui.pop_skin();
@@ -31,16 +41,16 @@ impl MainMenuScreen {
         }
 
         if widgets::Button::new("Options")
-            .position(vec2(0., 50.))
-            .size(vec2(100., 30.))
+            .position(vec2(start.x, start.y + button_size.y + spacing))
+            .size(button_size)
             .ui(ui)
         {
             println!("Options clicked (not implemented yet)");
         }
 
         if widgets::Button::new("Quit")
-            .position(vec2(0., 90.))
-            .size(vec2(100., 30.))
+            .position(vec2(start.x, start.y + 2. * button_size.y + 2. * spacing))
+            .size(button_size)
             .ui(ui)
         {
             ui.pop_skin();

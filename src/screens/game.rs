@@ -13,9 +13,11 @@ pub struct GameScreen {
 
 impl GameScreen {
     pub fn new(skin: Skin) -> Self {
+        let center = vec2(screen_width() * 0.5, screen_height() * 0.5);
+
         GameScreen {
             skin,
-            player: Player::new(),
+            player: Player::new_at(center),
             show_menu: false,
         }
     }
@@ -24,13 +26,12 @@ impl GameScreen {
         if is_key_pressed(KeyCode::Escape) {
             self.show_menu = !self.show_menu;
         }
-        
+
         if self.show_menu {
             return ScreenCommand::None;
         }
 
         let mut direction = Vec2::ZERO;
-
 
         if is_key_down(KeyCode::W) || is_key_down(KeyCode::Up) {
             direction.y -= 1.0;
@@ -54,12 +55,21 @@ impl GameScreen {
     pub fn draw(&mut self, ui: &mut Ui) -> ScreenCommand {
         self.player.draw();
 
-
         if self.show_menu {
             ui.push_skin(&self.skin);
+
+            let screen = vec2(screen_width(), screen_height());
+            let button_size = vec2(120., 30.);
+            let spacing = 12.;
+            let column_height = 2. * button_size.y + spacing;
+            let start = vec2(
+                (screen.x - button_size.x) * 0.5,
+                (screen.y - column_height) * 0.5,
+            );
+
             if widgets::Button::new("Back")
-                .position(vec2(10., 10.))
-                .size(vec2(100., 30.))
+                .position(start)
+                .size(button_size)
                 .ui(ui)
             {
                 ui.pop_skin();
@@ -67,8 +77,8 @@ impl GameScreen {
             }
 
             if widgets::Button::new("Quit")
-                .position(vec2(10., 50.))
-                .size(vec2(100., 30.))
+                .position(vec2(start.x, start.y + button_size.y + spacing))
+                .size(button_size)
                 .ui(ui)
             {
                 ui.pop_skin();

@@ -1,8 +1,8 @@
 use macroquad::prelude::*;
 
+mod entities;
 mod game;
 mod screens;
-mod entities;
 
 fn window_conf() -> Conf {
     Conf {

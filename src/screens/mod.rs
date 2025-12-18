@@ -2,9 +2,7 @@ pub mod director;
 pub mod game;
 pub mod main_menu;
 
-use crate::{
-    screens::{game::GameScreen, main_menu::MainMenuScreen},
-};
+use crate::screens::{game::GameScreen, main_menu::MainMenuScreen};
 use macroquad::ui::Skin;
 
 pub enum ScreenCommand {

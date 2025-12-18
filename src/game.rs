@@ -1,5 +1,5 @@
-use crate::screens::director::Director;
 use crate::screens::ScreenCommand;
+use crate::screens::director::Director;
 use macroquad::prelude::*;
 
 pub struct Game {
