@@ -25,11 +25,7 @@ impl MainMenuScreen {
         let screen = vec2(screen_width(), screen_height());
         let button_size = vec2(120., 30.);
         let spacing = 12.;
-        let column_height = 3. * button_size.y + 2. * spacing;
-        let start = vec2(
-            (screen.x - button_size.x) * 0.5,
-            (screen.y - column_height) * 0.5,
-        );
+        let start = vec2((screen.x - button_size.x) * 0.5, (screen.y) * 0.5);
 
         if widgets::Button::new("START GAME")
             .position(start)

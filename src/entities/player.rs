@@ -8,8 +8,10 @@ pub struct Player {
     immune_color: Color,
     direction: Vec2,
     pub health: i32,
+    pub max_health: i32,
     immunity: bool,
     immunity_timer: f32,
+    pub dead: bool,
 }
 
 impl Player {
@@ -22,8 +24,10 @@ impl Player {
             immune_color: DARKGREEN,
             direction: Vec2::ZERO,
             health: 100,
+            max_health: 100,
             immunity: false,
             immunity_timer: 0.0,
+            dead: false,
         }
     }
 
@@ -33,10 +37,14 @@ impl Player {
             self.position.y,
             self.size,
             self.size,
-            if self.immunity { self.immune_color } else { self.color },
+            if self.immunity {
+                self.immune_color
+            } else {
+                self.color
+            },
         );
     }
-    
+
     pub fn update(&mut self, dt: f32) {
         if self.immunity {
             self.immunity_timer -= dt;
@@ -54,7 +62,6 @@ impl Player {
         self.position += velocity;
     }
 
-
     pub fn set_direction(&mut self, direction: Vec2) {
         self.direction = direction;
     }
@@ -63,12 +70,12 @@ impl Player {
         if self.immunity {
             return;
         }
-        println!("Player took damage!");
         self.immunity = true;
         self.immunity_timer = 0.5;
         self.health -= damage;
         if self.health <= 0 {
             self.health = 0;
+            self.dead = true;
         }
     }
 

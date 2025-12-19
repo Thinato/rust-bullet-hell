@@ -34,6 +34,10 @@ impl GameScreen {
     }
 
     pub fn update(&mut self, dt: f32) -> ScreenCommand {
+        if self.player.dead {
+            return ScreenCommand::None;
+        }
+
         if is_key_pressed(KeyCode::Escape) {
             self.show_menu = !self.show_menu;
         }
@@ -94,13 +98,58 @@ impl GameScreen {
         self.player.draw();
         self.bullets.iter_mut().for_each(|bullet| bullet.draw());
         ui.push_skin(&self.skin);
-        widgets::Window::new(2, vec2(0., 0.), vec2(screen.x, 100.))
-            .movable(false)
-            .titlebar(false)
-            .ui(ui, |ui| {
-                widgets::Label::new("Health: ").ui(ui);
-                widgets::Label::new(format!("{}", self.player.health)).ui(ui);
-            });
+
+        draw_rectangle(0., 0., screen.x, 50., Color::from_rgba(45, 45, 45, 255));
+        draw_rectangle(10., 10., 100., 30., Color::from_rgba(35, 35, 35, 255));
+        draw_rectangle(
+            10.,
+            10.,
+            self.player.health as f32 / self.player.max_health as f32 * 100.,
+            30.,
+            Color::from_rgba(0, 200, 0, 255),
+        );
+        let health_text = &format!("{}/{}", self.player.health, self.player.max_health);
+
+        draw_text(
+            health_text,
+            60. - ((health_text.len() as f32 * 10.5) / 2.0),
+            30.,
+            24.,
+            Color::from_rgba(255, 255, 255, 255),
+        );
+
+        if self.player.dead {
+            let button_size = vec2(150., 42.);
+            let spacing = 18.;
+            let padding = 52.;
+            let column_height = 2. * button_size.y + spacing;
+            let window_size = vec2(button_size.x + padding * 2., column_height + padding * 2.);
+            let window_pos = (screen - window_size) * 0.5;
+            let inner_start = vec2(
+                (window_size.x - button_size.x) * 0.5,
+                (window_size.y - column_height) * 0.5,
+            );
+            widgets::Window::new(1, window_pos, window_size)
+                .movable(false)
+                .titlebar(false)
+                .ui(ui, |ui| {
+                    if widgets::Button::new("Back")
+                        .position(inner_start)
+                        .size(button_size)
+                        .ui(ui)
+                    {
+                        command = ScreenCommand::Replace(Screen::main_menu(self.skin.clone()));
+                    }
+
+                    if widgets::Button::new("Quit")
+                        .position(vec2(inner_start.x, inner_start.y + button_size.y + spacing))
+                        .size(button_size)
+                        .ui(ui)
+                    {
+                        command = ScreenCommand::Quit;
+                    }
+                });
+        }
 
         if self.show_menu {
             let button_size = vec2(150., 42.);
