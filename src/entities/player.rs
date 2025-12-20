@@ -62,8 +62,9 @@ impl Player {
         self.position += velocity;
     }
 
-    pub fn set_direction(&mut self, direction: Vec2) {
+    pub fn set_direction(&mut self, direction: Vec2) -> &mut Self {
         self.direction = direction;
+        self
     }
 
     pub fn take_damage(&mut self, damage: i32) {

@@ -61,8 +61,7 @@ impl GameScreen {
             direction.x += 1.0;
         }
 
-        self.player.set_direction(direction);
-        self.player.update(dt);
+        self.player.set_direction(direction).update(dt);
 
         self.bullet_spawn_timer -= dt;
         self.bullet_spawn_deduction_timer -= dt;
